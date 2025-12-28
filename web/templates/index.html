@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chess Opening Trainer</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="https://unpkg.com/@chrisoakman/chessboardjs@1.0.0/dist/chessboard-1.0.0.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js" 
+            integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" 
+            crossorigin="anonymous"
+            onerror="console.error('jQuery failed to load')"
+            onload="console.log('jQuery loaded successfully')"></script>
+    <script src="https://unpkg.com/@chrisoakman/chessboardjs@1.0.0/dist/chessboard-1.0.0.min.js"
+            onerror="console.error('ChessBoard.js failed to load'); window.chessboardLoadError = true;"
+            onload="console.log('ChessBoard.js loaded successfully'); window.chessboardLoaded = true;"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.2/chess.min.js"
+            onerror="console.error('Chess.js failed to load from CDN 1, trying backup...'); window.chessjsLoadError = true;"
+            onload="console.log('Chess.js loaded successfully'); window.chessjsLoaded = true; window.Chess = Chess;"></script>
+    <script>
+        // Backup loader if first CDN fails
+        setTimeout(function() {
+            if (typeof Chess === 'undefined') {
+                console.log('Trying backup CDN for Chess.js...');
+                const script = document.createElement('script');
+                script.src = 'https://unpkg.com/chess.js@0.13.4/dist/chess.min.js';
+                script.onload = function() {
+                    console.log('Chess.js loaded from backup CDN');
+                    window.chessjsLoaded = true;
+                    if (typeof Chess !== 'undefined') {
+                        window.Chess = Chess;
+                    }
+                };
+                script.onerror = function() {
+                    console.error('Backup CDN also failed, trying CDNJS...');
+                    const script2 = document.createElement('script');
+                    script2.src = 'https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.2/chess.min.js';
+                    script2.onload = function() {
+                        console.log('Chess.js loaded from CDNJS');
+                        window.chessjsLoaded = true;
+                        if (typeof Chess !== 'undefined') {
+                            window.Chess = Chess;
+                        }
+                    };
+                    document.head.appendChild(script2);
+                };
+                document.head.appendChild(script);
+            }
+        }, 1000);
+    </script>
+    <script>
+        // Debug: Log when all scripts are loaded (after page loads)
+        window.addEventListener('load', function() {
+            console.log('=== Page Loaded ===');
+            console.log('jQuery:', typeof jQuery !== 'undefined', typeof $ !== 'undefined');
+            console.log('ChessBoard:', typeof ChessBoard !== 'undefined', 'Loaded flag:', window.chessboardLoaded);
+            console.log('Chess:', typeof Chess !== 'undefined', typeof window.Chess !== 'undefined', 'Loaded flag:', window.chessjsLoaded);
+            if (window.chessboardLoadError) {
+                console.error('ChessBoard.js had a load error - trying alternative CDN');
+            }
+            if (window.chessjsLoadError) {
+                console.error('Chess.js had a load error - trying alternative CDN');
+            }
+            if (typeof Chess !== 'undefined') {
+                console.log('Chess constructor:', typeof Chess);
+            }
+            if (typeof ChessBoard !== 'undefined') {
+                console.log('ChessBoard function:', typeof ChessBoard);
+            }
+        });
+    </script>
+</head>
+<body>
+    <noscript>
+        <div style="padding: 20px; background: red; color: white; text-align: center;">
+            JavaScript is required for this application to work. Please enable JavaScript in your browser.
+        </div>
+    </noscript>
+    <div class="container">
+        <header>
+            <h1>♟️ Chess Opening Trainer</h1>
+            <p class="subtitle">Master your openings with spaced repetition</p>
+        </header>
+
+        <!-- Setup Screen -->
+        <div id="setup-screen" class="screen active">
+            <div class="setup-card">
+                <h2>Get Started</h2>
+                
+                <div class="form-group">
+                    <label for="username">Username:</label>
+                    <input type="text" id="username" placeholder="Enter your username" value="guest">
+                </div>
+
+                <div class="form-group">
+                    <label>Select Openings to Practice:</label>
+                    <div class="pgn-selection">
+                        <div class="pgn-group">
+                            <h3>White Openings</h3>
+                            <div id="white-openings" class="checkbox-group"></div>
+                        </div>
+                        <div class="pgn-group">
+                            <h3>Black Openings</h3>
+                            <div id="black-openings" class="checkbox-group"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <button id="start-training-btn" class="btn btn-primary">Start Training</button>
+            </div>
+        </div>
+
+        <!-- Training Screen -->
+        <div id="training-screen" class="screen">
+            <div class="training-layout">
+                <!-- Left Panel: Chess Board -->
+                <div class="board-panel">
+                    <div class="board-header">
+                        <h2 id="opening-name">Loading...</h2>
+                        <div class="status-indicator">
+                            <span id="status-text">Ready</span>
+                        </div>
+                    </div>
+                    <div id="board-container"></div>
+                    <div class="board-controls">
+                        <button id="hint-btn" class="btn btn-secondary">Hint</button>
+                        <button id="solution-btn" class="btn btn-secondary">Show Solution</button>
+                        <button id="next-line-btn" class="btn btn-primary" style="display: none;">Next Line</button>
+                    </div>
+                </div>
+
+                <!-- Right Panel: Info & Stats -->
+                <div class="info-panel">
+                    <div class="info-card">
+                        <h3>Training Info</h3>
+                        <div class="info-item">
+                            <span class="info-label">Username:</span>
+                            <span id="display-username">-</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Opening:</span>
+                            <span id="display-opening">-</span>
+                        </div>
+                    </div>
+
+                    <div class="info-card">
+                        <h3>Progress</h3>
+                        <div class="progress-stats">
+                            <div class="stat">
+                                <span class="stat-label">Mastery</span>
+                                <div class="stat-value" id="mastery-value">-</div>
+                            </div>
+                            <div class="stat">
+                                <span class="stat-label">Next Review</span>
+                                <div class="stat-value" id="interval-value">-</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button id="back-to-setup-btn" class="btn btn-outline">Change Settings</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Simple test to verify page is loading
+        console.log('HTML loaded, about to load app.js');
+        window.pageLoaded = true;
+    </script>
+    <script src="{{ url_for('static', filename='app.js') }}"></script>
+    <script>
+        // Verify app.js loaded
+        if (typeof window.pageLoaded !== 'undefined') {
+            console.log('Page structure loaded successfully');
+        }
+    </script>
+</body>
+</html>
+

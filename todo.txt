@@ -1,0 +1,23 @@
+Feature Enhancements 🚀
+1️⃣ Improve Input Handling & User Experience
+    ✅ Allow UCI (Universal Chess Interface) input (e.g., e2e4) in addition to SAN (Standard Algebraic Notation).
+    ✅ Add move legality check before parsing to prevent invalid inputs from causing errors.
+    ✅ Provide a hint system that gives partial move suggestions instead of showing the full move immediately.
+2️⃣ Smarter Training & Feedback
+    ✅ Track mistakes and prioritize repeating incorrect moves more often in training.
+    ❌ Score system for tracking progress (e.g., correct streaks, accuracy percentage).
+    ❌ Implement an adaptive difficulty system that increases complexity based on performance.
+    ❌ Store training history so the user can review incorrect moves later.
+3️⃣ Enhanced Opening Management
+    ✅ Allow the user to load multiple PGN files and select which opening to train.
+    ❌ Organize openings into categories (e.g., Open Games, Closed Games, Sicilian Variations).
+    ❌ Allow users to add their own moves/variations to existing PGN lines dynamically.
+4️⃣ GUI Implementation (Future Expansion)
+    ✅ Build a GUI-based trainer using PyQt or Tkinter for easier navigation.
+    ✅ Add a visual chessboard instead of ASCII output for better usability.
+    ✅ Implement drag-and-drop move input instead of typing notation.
+    ❌ Include a PGN editor where users can manually edit openings and add notes.
+5️⃣ Web-Based Expansion (Long-Term Goal)
+    ❌ Convert this into a web app for cross-platform access.
+    ❌ Implement cloud-based storage for saving training progress.
+    ❌ Allow users to share and download opening repertoires from a database.
