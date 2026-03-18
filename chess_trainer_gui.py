@@ -154,6 +154,9 @@ class ChessBoard(QGraphicsView):
         self.square_size = 80  # Adjust based on image size
         self.piece_images = {}  # Dictionary to store loaded images
 
+        # in ChessBoard.__init__ (after self.square_size / self.piece_images setup)
+        self.images_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "images")
+
         self.line = None
         self.mistakes = None
         self.streaks = None
@@ -186,12 +189,22 @@ class ChessBoard(QGraphicsView):
 
         self.play_next_move()
 
+    def _symbol_to_image_key(self, piece_symbol: str) -> str:
+        # python-chess: white = uppercase, black = lowercase
+        return f"w{piece_symbol}" if piece_symbol.isupper() else f"{piece_symbol}"
+
     def load_piece_images(self):
         """Load chess piece images into a dictionary."""
-        piece_names = ['P', 'p', 'R', 'r', 'N', 'n', 'B', 'b', 'Q', 'q', 'K', 'k']
+        piece_names = ["wP", "wR", "wN", "wB", "wQ", "wK", "p", "r", "n", "b", "q", "k"]
         for piece in piece_names:
-            self.piece_images[piece] = QPixmap(f"images/{piece}.png").scaled(self.square_size, self.square_size, Qt.AspectRatioMode.KeepAspectRatio)
-
+            path = os.path.join(self.images_dir, f"{piece}.png")
+            pixmap = QPixmap(path).scaled(
+                self.square_size,
+                self.square_size,
+                Qt.AspectRatioMode.KeepAspectRatio,
+            )
+            self.piece_images[piece] = pixmap
+    
     def draw_board(self):
         """Draw the chessboard squares."""
         colors = [QColor(240, 217, 181), QColor(181, 136, 99)]  # Light and dark squares
@@ -217,9 +230,17 @@ class ChessBoard(QGraphicsView):
                 if piece:
                     self.add_piece(piece.symbol(), square)  # Place piece
 
+    # replace add_piece
     def add_piece(self, piece_symbol, square):
         """Place a piece on the board using PieceItem class."""
-        pixmap = QPixmap(f"images/{piece_symbol}.png").scaled(self.square_size, self.square_size)
+        image_key = self._symbol_to_image_key(piece_symbol)  # e.g. P->wP, n->n
+        pixmap = self.piece_images.get(image_key)
+
+        if not pixmap or pixmap.isNull():
+            # Optional: helps debug bad/missing filenames
+            print(f"Missing piece image for key '{image_key}'")
+            return
+
         piece = PieceItem(pixmap, square, self.square_size, self.lines, self)
         self.scene.addItem(piece)
 

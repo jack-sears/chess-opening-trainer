@@ -289,5 +289,51 @@
             [],
             []
         ]
+    },
+    "sicilian-bowdler": {
+        "mistakes": [
+            1,
+            0,
+            0,
+            0
+        ],
+        "streaks": [
+            0,
+            0,
+            0,
+            0
+        ],
+        "mastery_level": [
+            0.0,
+            0.0,
+            0.0,
+            0.0
+        ],
+        "easiness_factor": [
+            2.3,
+            2.5,
+            2.5,
+            2.5
+        ],
+        "last_practiced": [
+            "2026-03-18T18:34:36.596050",
+            null,
+            null,
+            null
+        ],
+        "interval_days": [
+            0.25,
+            1.0,
+            1.0,
+            1.0
+        ],
+        "recent_mistakes": [
+            [
+                "2026-03-18T18:34:03.543692"
+            ],
+            [],
+            [],
+            []
+        ]
     }
 }
