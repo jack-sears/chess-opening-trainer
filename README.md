@@ -31,11 +31,11 @@ python main.py
 - Click Select White PGNs and/or Select Black PGNs.
 - Choose training mode
 - Click Start Training
-Drag a piece to make your move
-Use Hint to highlight the starting square
-Use Show Solution to display the correct move
+Drag a piece to make your move  
+Use Hint to highlight the starting square  
+Use Show Solution to display the correct move  
 
 ## Notes
-pgn/white/ and pgn/black/: suggested locations for opening files. Can use lichess or chess.com to create your own pgn.
-profiles/: user progress JSON files are saved here automatically
-images/: chess piece images used by the GUI
+pgn/white/ and pgn/black/: suggested locations for opening files. Can use lichess or chess.com to create your own pgn.  
+profiles/: user progress JSON files are saved here automatically  
+images/: chess piece images used by the GUI  
